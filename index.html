@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Home / Finite Grids</title>
+
+<link rel="icon" type="image/svg" href="./finite-grids-favicon.svg"> <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght,wdth@12..96,200..800,75..100&display=swap" rel="stylesheet"> <style>
+  /*////// FONTS //////*/
+
+  /* These are some variants of the general Bricolage Grotesque font I used but weren't available to link through a URL so are connected locally through the font file */
+  @font-face {
+    font-family: 'BricolageExtraBold';
+    src: url('fonts/BricolageGrotesque12ptCondensed-ExtraBold.otf') format('opentype');
+  }
+  
+  @font-face {
+    font-family: 'BricolageBold';
+    src: url('fonts/BricolageGrotesque12ptCondensed-Bold.otf') format('opentype');
+  }
+
+
+
+   /*////// LAYOUT //////*/
+
+  /* Main body styling */
+  body {
+    background: #121212;
+    color: #e0e0e0;
+    font-family: "Bricolage Grotesque", sans-serif;
+    margin: 0;
+    height: 100vh;
+    display: flex; 
+    flex-direction: column;
+    justify-content: center; 
+    overflow: hidden; 
+  }
+
+
+
+
+   /*////// TITLE SCREEN OVERLAY //////*/
+
+  /* This 'intro container' covers the whole screen initially, and then is removed completely with the Javascript */
+  #intro-container {
+    position: fixed;
+    width: 100vmax; 
+    height: 100vmax;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000; /* This works like the 'move to front' in design software, moving the title screen to the front of everything including the grids */
+    background: #121212;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    will-change: clip-path;
+    backface-visibility: hidden;
+  }
+
+  /* The animate-out transition that closes the title screen as a square I got from https://www.transition.style/ */
+  .animate-out {
+    animation: 2.5s cubic-bezier(0.8, 0, 0.2, 1) square-out-center both;
+  }
+
+  @keyframes square-out-center {
+    0% { clip-path: inset(0 0 0 0); }
+    100% { clip-path: inset(50% 50% 50% 50%); }
+  }
+
+
+   /*////// TITLE INTRO SCREEN TYPOGRAPHY //////*/
+
+  /* Styling for main title */
+  .title-text {
+    font-family: 'BricolageExtraBold', sans-serif;
+    font-size: 20vw; /* Scales with viewport width */
+    line-height: 0.75; /* Tight spacing */
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 40px;
+    letter-spacing: 0;
+    min-height: 1.5em; /* Prevents jumping during glitch */
+    width: 100vw; 
+  }
+
+  /* Styling for the start button */
+  .start-btn {
+    background: transparent; /* See-through */
+    border: 1px solid #e0e0e0; /* Thin white border */
+    color: #e0e0e0;
+    padding: 15px 60px; /* Big click area */
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-size: 18px;
+    cursor: pointer; /* Hand icon on hover */
+    text-transform: uppercase;
+    transition: all 0.3s ease; /* Smooth hover effect */
+  }
+
+  /* Hover color change for Start button */
+  .start-btn:hover {
+    background: #e0e0e0;
+    color: #121212;
+  }
+
+
+   /*////// MAIN CONTENT //////*/
+
+  /* Holds the two grid sections */
+  .wrapper {
+    display: flex; /* Side by side alignment */
+    justify-content: center;
+    align-items: flex-start;
+    gap: 120px; /* Space between the two grids */
+  }
+
+  /* Individual grid section styling */
+  .section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Headers for each grid sections */
+  h2 {
+    font-family: 'BricolageBold', sans-serif;
+    font-size: 32px;
+    letter-spacing: 0;
+    margin: 0 0 20px 0;
+    text-transform: uppercase;
+    text-align: center;
+    cursor: default; /* Indicates no link interaction */
+  }
+
+  /* Expanding info text (Flow-based to push content down) */
+  .info-text {
+    display: block;
+    font-family: "Bricolage Grotesque", sans-serif; 
+    font-size: 14px;
+    font-weight: normal;
+    color: #888;
+    text-transform: none; 
+    letter-spacing: normal;
+    
+    /* Animation Properties */
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    margin-top: 0;
+  }
+
+  /* Reveal on hover */
+  h2:hover .info-text {
+    max-height: 30px; /* Expands to show text, pushing the grid down */
+    opacity: 1;
+    margin-top: 5px;
+  }
+
+  /* The container for the 64 squares making up the grid */
+  .grid {
+    display: grid; /* Enables grid layout */
+    grid-template-columns: repeat(8, 44px); /* 8 columns fixed width */
+    grid-template-rows: repeat(8, 44px); /* 8 rows fixed height */
+    gap: 3px; /* Space between cells */
+    background: #333; /* Dark grey border effect */
+    padding: 10px;
+  }
+
+  /* Individual cell styling */
+  .cell {
+    width: 44px;
+    height: 44px;
+    background: #eee;
+  }
+
+  /* Class added by Javascript based on binary to turn cell black */
+  .cell.black {
+    background: #000;
+  }
+
+  /* Container for slider and counter under ordered grid */
+  .controls {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+
+   /*////// SPEED SLIDER //////*/
+
+  /* Custom styling for the range input */
+  input[type="range"] {
+    -webkit-appearance: none; /* Removes default browser style */
+    appearance: none;
+    width: 100%;
+    max-width: 376px; /* Matches ordered grid width */
+    height: 20px; 
+    background: transparent; 
+    cursor: pointer;
+    margin-bottom: 25px;
+    background-image: linear-gradient(to bottom, transparent 9px, #444 9px, #444 11px, transparent 11px);
+  }
+
+  /* Slider handle styling */
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #e0e0e0;
+    border: none;
+    border-radius: 0; /* this turns the handle into that square shape to match the grid system */
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #e0e0e0;
+    border: none;
+    border-radius: 0;
+  }
+
+
+   /*////// COUNTER //////*/
+
+  /* counter styling */
+  .counter {
+    font-size: 16px;
+    font-variant-numeric: tabular-nums;
+    color: #888;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  /* Dims the commas on the counter numbers */
+  .comma-dim {
+    opacity: 0.5;
+    font-weight: normal;
+  }
+  
+  #orderedCount {
+    color: #ffffff;
+    font-weight: bold;
+  }
+
+
+  /*////// FOOTER NAVIGATION BUTTONS //////*/
+
+  /* Navigation buttons positioning */
+  .nav-container {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    display: flex;
+    gap: 30px;
+  }
+
+  /* Navigation buttons styling */
+  .nav-link {
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 400; 
+    font-size: 14px;
+    text-decoration: none;
+    color: #e0e0e0;
+    text-transform: uppercase;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    letter-spacing: 0.1em;
+  }
+
+  /* Hover color change for shop and about buttons */
+  .nav-link:hover {
+    opacity: 1;
+  }
+</style>
+</head>
+<body>
+
+<div id="intro-container"> <div class="title-text" id="glitch-title">FINITE<br>GRIDS</div> <!--This container holds the intro title screen-->
+  <button class="start-btn" id="start-btn" onclick="startExperience()">Start</button> </div>
+
+<div class="wrapper">
+  
+  <div class="section"> <h2>Ordered<div class="info-text">Completion Time: 1,949,040,000 years</div></h2> <!--This is the ordered grid, everything is generated through the Javascript in the browser's memory and actually isn't already in the HTML from the beginning. -->
+    <div class="grid" id="orderedGrid"></div> <div class="controls"> <input type="range" min="1" max="300" value="1" id="orderedSpeed"> <div class="counter"> <span id="orderedCount">0</span>
+        <span>/</span>
+        <span>18<span class="comma-dim">,</span>446<span class="comma-dim">,</span>744<span class="comma-dim">,</span>073<span class="comma-dim">,</span>709<span class="comma-dim">,</span>551<span class="comma-dim">,</span>616</span> </div>
+    </div>
+  </div>
+
+  <div class="section"> <h2>Random<div class="info-text">Estimated Completion Time: 86,600,000,000 years</div></h2> <!--This is the random grid, it has even less fixed HTML because it doesn't have a slider or counter-->
+    <div class="grid" id="randomGrid"></div> </div>
+
+</div>
+
+<div class="nav-container"> <!--These are the buttons in the footer-->
+  <a href="shop.html" class="nav-link">SHOP</a>
+  <a href="about.html" class="nav-link">ABOUT</a>
+</div>
+
+<script>
+
+
+///// 1. GLITCHING TITLE SCREEN SECTION /////
+
+document.addEventListener("DOMContentLoaded", function () { // Waits for page to load first
+    const textElement = document.getElementById("glitch-title"); // Grabs the title element named as id 'glitch-title' above in the HTML
+    const originalLines = ["FINITE", "GRIDS"]; // Defines what the title should normally say, in this case 'FINITE' and 'GRIDS'
+    const replacements = { 'I': ['!'], 'G': ['6'], 'R': ['₹'], 'S': ['$'] }; // This chooses what characters turn into what, in my GD2 Project this was more randomized but in this one I specifically chose certain characters to be replaced by certain other ones
+
+    function glitchEffect() { // Function runs every few seconds to glitch title
+        const lineToGlitch = Math.random() > 0.3 ? originalLines.map(line => { // 0.3 translates 30% chance to trigger glitch
+            return line.split('').map(char => { // Splits title into letters so they can be custom changed based on the options we put above
+                if (replacements[char] && Math.random() < 0.3) { // 0.3 translates to 30% chance the specified individual letters will glitch
+                   const options = replacements[char];
+                   return options[Math.floor(Math.random() * options.length)];
+                }
+                return char;
+            }).join('');
+        }) : originalLines;
+        textElement.innerHTML = lineToGlitch.join('<br>'); // Updates HTML with glitched text
+        setTimeout(() => { textElement.innerHTML = "FINITE<br>GRIDS"; }, 1000); // Updates HTML with normal title letters
+    }
+    setInterval(glitchEffect, 3000); // Runs glitch every 3 seconds or 3000 milliseconds
+});
+
+
+
+
+///// 2. TITLE SCREEN 'START' BUTTON SECTION /////
+
+function startExperience() { // Function starts when start button is clicked */
+  const intro = document.getElementById('intro-container'); // intro container is the id given to the title screen
+  intro.classList.add('animate-out'); // starts CSS animation I got from https://www.transition.style/ //
+  startOrdered(); // Starts ordered grid function AFTER start button is clicked instead of starting when page loads
+  setInterval(stepRandom, 1000); // Starts random grid function AFTER start button is clicked instead of starting when page loads
+  setTimeout(() => { intro.style.display = 'none'; }, 2500); // Removes title screen completely after animation
+}
+
+
+
+
+///// 3. ORDERED GRID SECTION /////
+
+// Selects elements for ordered grid, named accordingly below as the grid itself, the speed slider and the counter below it
+const orderedGrid = document.getElementById("orderedGrid");
+const orderedSpeed = document.getElementById("orderedSpeed");
+const orderedCountDisplay = document.getElementById("orderedCount");
+const orderedCells = []; // This is an array, it basically grouped multiple similar things together, in this case, all the divs making up the ordered grid, as in the individual black or white cells within the grid.
+
+for (let i = 0; i < 64; i++) { // This creates 64 of the same divs, the same that are in that array above, without needing to manually make all 64 in the HTML section.
+  const c = document.createElement("div");
+  c.className = "cell"; // this connects these 64 divs to their CSS style class to format them correctly
+  orderedGrid.appendChild(c); // this adds those divs to the page
+  orderedCells.push(c); // this adds those divs to the array above
+}
+
+let index = BigInt(0); // I couldn't actually put the entire 18 quintillion number inside because it's larger than 2^53, which then needs BigInt to compute instead
+let orderedTimer;
+
+function formatWithDimCommas(numStr) { // I created this seperately because the comas in the counter numbers were too bright? I guess, so this dimmed them slightly to make the actual number more clear.
+  return numStr.replace(/,/g, '<span class="comma-dim">,</span>');
+}
+
+function stepOrdered() { // This is the function that actually makes the divs switch to black or white based on binary
+  index++; // the double + increases the value of the binary over and over
+  for (let i = 0; i < 64; i++) {
+    const bit = (index >> BigInt(63 - i)) & 1n; // This is a 'bitwise shift' that decides wheter the cell should be black or white
+    orderedCells[i].classList.toggle("black", bit === 1n); // This changes the style of the div/cell based on the binary decision
+  }
+  orderedCountDisplay.innerHTML = formatWithDimCommas(index.toLocaleString()); // This adds an additional number to the counter to keep it counting
+}
+
+function startOrdered() { // This function makes the speed slider work
+  clearInterval(orderedTimer); // This stops the current ordered timer speed
+  const speed = parseInt(orderedSpeed.value);
+  const interval = 1000 / (speed || 1); // This changes the speed based on slider input, its base is 1000 milliseconds or changing once per second
+  orderedTimer = setInterval(stepOrdered, interval); // starts the new speed timer
+}
+
+orderedSpeed.addEventListener("input", startOrdered); // This waits for the user to interact with the speed slider
+
+
+
+
+///// 4. RANDOM GRID SECTION  /////
+
+// Selects elements for random grid, in this case just the grid and the array of divs within it
+const randomGrid = document.getElementById("randomGrid");
+const randomCells = []; // Same like the ordered grid, this holds an 'array' that holds all the divs generation by the 'for' below this
+
+// Exactly like the ordered grid this creates the 64 divs making up the 64 squares on the random grid
+for (let i = 0; i < 64; i++) {
+  const c = document.createElement("div");
+  c.className = "cell";
+  randomGrid.appendChild(c);
+  randomCells.push(c);
+}
+
+// Unlike the ordered grid which runs in order through binary, this one runs a randommized toggle between black or white
+function stepRandom() {
+  randomCells.forEach(cell => {
+    cell.classList.toggle("black", Math.random() > 0.5); // specifically here through the 0.5 applies a 50/50 chance that each one of the 64 squares are either black or white
+  });
+}
+</script>
+
+</body>
+</html>

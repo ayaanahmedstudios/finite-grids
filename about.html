@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>About / Finite Grids</title>
+
+    <link rel="icon" type="image/svg" href="./finite-grids-favicon.svg">
+
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght,wdth@12..96,200..800,75..100&display=swap" rel="stylesheet">
+
+    <style>
+        /*////// FONTS //////*/
+
+        /* Defining local fonts so we can use them by name later. */
+        @font-face {
+            font-family: 'BricolageExtraBold';
+            src: url('fonts/BricolageGrotesque12ptCondensed-ExtraBold.otf') format('opentype');
+        }
+        @font-face {
+            font-family: 'DepartureMono';
+            src: url('fonts/DepartureMono-Regular.otf') format('opentype');
+        }
+
+
+        /*////// LAYOUT //////*/
+
+        body {
+            background: #121212;
+            color: #e0e0e0;
+            font-family: "Bricolage Grotesque", sans-serif;
+            margin: 0;
+            
+            
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 60px 20px 300px 20px;
+            
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* Wrapper limits the width so lines don't get too long to read (Also just would be good typography) */
+        .content-wrapper {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+
+        /*////// HEADER //////*/
+
+        .header-link {
+            text-decoration: none;
+            color: #e0e0e0;
+            margin-bottom: 40px;
+            transition: opacity 0.2s;
+            display: flex; /* Aligns Text + by + My Ayaan Ahmed Logo in one row */
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+        }
+        .header-link:hover { opacity: 0.7; }
+
+        h1 {
+            font-family: 'BricolageExtraBold', sans-serif;
+            font-size: 72px;
+            margin: 0;
+            line-height: 1;
+            text-transform: uppercase;
+        }
+
+        .by-text {
+            font-size: 24px;
+            font-weight: 300;
+            margin-top: 10px;
+            color: #888;
+        }
+
+        .logo-img {
+            height: 40px;
+            width: auto;
+            margin-top: 5px;
+        }
+
+
+        /*////// ABOUT //////*/
+
+        .about-container {
+            width: 100%;
+            max-width: 700px;
+            margin-bottom: 60px;
+            font-size: 18px; 
+            line-height: 1.6;
+            color: #e0e0e0;
+            text-align: left;
+        }
+
+
+        /*////// TABLE STYLES (SO COMPLICATED) //////*/
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 60px;
+            border: 2px solid #fff;
+            table-layout: fixed;
+        }
+
+        td {
+            padding: 15px;
+            vertical-align: top;
+            border-top: 2px solid #fff;
+            line-height: 1.4;
+            font-size: 15px;
+            word-wrap: break-word; /* Prevents long URLs from breaking layout */
+        }
+
+        /* Style for the Header Cells (The Math, Citations, Code Citations) */
+        .title-cell {
+            background-color: #222;
+            color: #fff;
+            font-weight: 700;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+
+        /*////// COLUMN STYLES //////*/
+
+        /* FIRST COLUMN (Title / Code) */
+        tr td:nth-child(1):not(.title-cell) {
+            background: #1a1a1a;
+            font-weight: 600;
+            color: #ccc;
+            border-right: 2px solid #fff;
+        }
+
+        /* SECOND COLUMN (Description) */
+        tr td:nth-child(2) {
+            color: #bbb;
+            border-right: 2px solid #fff;
+            text-wrap: pretty; /* I cited this in the citations too, I think the name is funny and it helps automate good typography. */
+        }
+
+        /* THIRD COLUMN (Citations) */
+        tr td:nth-child(3) {
+            color: #e0e0e0; /* Always in Chicago style too */
+        }
+
+
+        /*////// CODE CITATIONS TABLE //////*/
+
+        /* 1st column ONLY with class "code-table" */
+        .code-table tr td:nth-child(1) {
+            background: #181818; 
+            font-family: 'DepartureMono', monospace; 
+            font-size: 13px;
+            white-space: nowrap; 
+        }
+
+
+        /*////// THE MATH SECTION //////*/
+
+        .math-block {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            font-family: 'DepartureMono', monospace;
+            font-size: 16px;
+        }
+
+        .math-row {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #333;
+        }
+        .math-row:last-child { border-bottom: none; }
+
+        .math-header {
+            font-family: "Bricolage Grotesque", sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .math-rate {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .equation-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        sup { /* I think this is also funny, this basically turns like 2^64 from that to 2 to the power of 64 where the 64 is actually tiny and to the right, for some reason only worked in spans for me? */
+            vertical-align: super;
+            font-size: 0.6em;
+        }
+
+        /* Fraction Builder */
+        .fraction {
+            display: inline-flex; /*This could have been written like 1/2 but I didn't want to use a slash */
+            flex-direction: column;
+            align-items: center;
+            margin: 0 5px;
+        }
+        .numerator {
+            border-bottom: 1px solid #fff;
+            padding-bottom: 2px;
+            text-align: center;
+        }
+        
+        .yellow { color: #FFD700; }
+        .grey { color: #666; font-size: 14px; }
+
+
+        /*////// FOOTER STYLES //////*/
+
+        a.citation-link {
+            color: #FFD700;
+            text-decoration: none;
+            display: block;
+            margin-top: 4px;
+        }
+        a.citation-link:hover { text-decoration: underline; }
+
+        .footer {
+            font-size: 14px; 
+            color: #666;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+
+        /*////// BUTTONS //////*/
+
+        .nav-container {
+            position: fixed; /* Locks to screen corner */
+            bottom: 40px;
+            right: 40px;
+            display: flex;
+            gap: 30px;
+            z-index: 9999; /* Ensures it sits on top of everything */
+        }
+
+        .nav-link {
+            font-weight: 400; 
+            font-size: 14px;
+            text-decoration: none;
+            color: #e0e0e0;
+            text-transform: uppercase;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+            letter-spacing: 0.1em;
+        }
+        .nav-link:hover { opacity: 1; }
+
+    </style>
+</head>
+<body>
+
+<div class="content-wrapper">
+    
+  <a href="index.html" class="header-link"> <!--This holds the main logo on the top along with 'by' and then my name logo spelling out FINITE GRIDS by AYAAN AHMED-->
+    <h1>Finite Grids</h1>
+    <span class="by-text">by</span>
+    <img src="logo.svg" alt="Logo" class="logo-img"> <!--This links to an SVG Image of my logo I added to the Folder-->
+  </a>
+
+  <div class="about-container">
+      Finite Grids is a project surrounding completeness, the completeness of every possible iteration of an <span style="font-family: 'DepartureMono', monospace;">8x8</span> black and white grid. The ordered grid you see is always unique, and has <span style="font-family: 'DepartureMono', monospace;">18,446,744,073,709,551,616</span> possible states,
+      a finite set, but impossible for a human to comprehend. As the calculations below show, the ordered grid will take <span style="font-family: 'DepartureMono', monospace;">1.9</span> billion years to complete, longer than this website probably, and the randomized grid would take an estimated <span style="font-family: 'DepartureMono', monospace;">86</span> billion years. <!--This is the about paragraph, I made the numbers a different font to match the rest of the math numbers below.-->
+  </div>
+
+  <table>
+    <tr>
+      <td class="title-cell">The Math</td> <!--There's two main tags making up tables, those being 'td' or table data which is what's inside the table, and 'tr' which are the specific table rows-->
+    </tr>
+    <tr>
+      <td style="padding: 30px;">
+        <div class="math-block"> <!--Tables can be quite complex, and I didn't make this one from scratch, I reused one I made in Graphic Design 2 for another website project-->
+          
+          <div class="math-row">
+            <div class="math-header">Total Possible Patterns</div>
+            <div class="equation-container">
+              <span>2<sup>64</sup> = 18,446,744,073,709,551,616</span>
+            </div>
+          </div>
+
+          <div class="math-row">
+            <div class="math-header">Ordered Completion Time</div>
+            <div class="math-rate">300 Patterns / Second</div>
+            
+            <div class="equation-container">
+              <div class="fraction">
+                <span class="numerator">2<sup>64</sup></span>
+                <span class="denominator">300</span>
+              </div>
+              = 6.15 x 10<sup>16</sup> seconds
+            </div>
+            
+            <div class="equation-container">
+              = 1.95 x 10<sup>9</sup> years
+            </div>
+
+            <div class="equation-container">
+              = 1,949,040,000 years
+            </div>
+
+            <div class="equation-container">
+              = <span class="yellow">1.95 billion years</span>
+              <span class="grey">(14% age of universe)</span>
+            </div>
+          </div>
+
+          <div class="math-row">
+            <div class="math-header">Random Completion Estimate</div>
+            <div class="math-rate">300 Patterns / Second</div>
+            <div class="equation-container">
+              <div class="fraction">
+                <span class="numerator">2<sup>64</sup> x 44.36</span>
+                <span class="denominator">300</span>
+              </div>
+              ≈ 8.18 x 10<sup>18</sup> seconds
+            </div>
+            <div class="equation-container">
+              ≈ 8.66 x 10<sup>10</sup> years
+            </div>
+            <div class="equation-container">
+              ≈ 86,600,000,000 years
+            </div>
+            <div class="equation-container">
+              ≈ <span class="yellow">86.6 billion years</span>
+              <span class="grey">(6x age of universe)</span>
+            </div>
+          </div>
+
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <table>
+    <colgroup>
+      <col style="width: 20%;">
+      <col style="width: 50%;"> <col style="width: 30%;">
+    </colgroup>
+    <tr>
+      <td class="title-cell" colspan="3">Citations</td> <!--This is the start of the only citations table-->
+    </tr>
+    
+    <tr>
+      <td>Conceptual Framework</td>
+      <td>The Library of Babel is a theoretical library containing every possible 410 page book, and the Library of Babel website has a 3,200 character limit, making both technically finite, much like Finite Grids but on an astronomical scale unthinkable.</td>
+      <td>Borges, Jorge Luis. “The Library of Babel.” Accessed Jan 2026. <a href="https://libraryofbabel.info/" class="citation-link" target="_blank">https://libraryofbabel.info/</a></td>
+    </tr>
+    
+    <tr>
+      <td>Artistic Reference</td>
+      <td>Rob Weychert, building upon Sol LeWitt’s variations on open cubes, created a digital version of every possible open cube. It basically 'exhausts' every variation possible, much like how Finite Grids exhausts every variation of an 8x8 grid.</td>
+      <td>Rob Weychert. "Variations of Incomplete Open Cubes." Accessed Jan 2026. <a href="https://cubes-revisited.art/" class="citation-link" target="_blank">https://cubes-revisited.art/</a></td>
+    </tr>
+    
+    <tr>
+      <td>Time & Completion</td>
+      <td>On Kawara’s 'Date Paintings' exist based on his personal claims from the 60s to the 2010s, no one can realistically verify his huge project, and technically, neither can you verify Finite Grids because it takes almost 2 billion years.</td>
+      <td>The Art Story. "On Kawara." Accessed Feb 2026. <a href="https://www.theartstory.org/artist/on-kawara/" class="citation-link" target="_blank">https://www.theartstory.org/artist/on-kawara/</a></td>
+    </tr>
+    
+    <tr>
+      <td>Glitch Inspiration</td>
+      <td>Originally a website I found during my web design project for my Graphic Design 2 course, inspiring the character glitching on the title intro screen.</td>
+      <td>Departure Mono. "Departure Mono." Accessed Feb 2026. <a href="https://departuremono.com/" class="citation-link" target="_blank">https://departuremono.com/</a></td>
+    </tr>
+    
+    <tr>
+      <td>Shop Assets</td>
+      <td>A blank white T-Shirt image used as the canvas to make the Finite Grid shirt on the shop page, I designed the layout seperately on Affinity to print, and then replicated it with code onto this blank shirt later.</td>
+      <td>Jacques Durocher. "White T-Shirt Plain Mockup." Adobe Stock. Accessed Feb 2026. <a href="https://stock.adobe.com/ca/images/white-t-shirt-plain-design-mockup-blank-shirt-isolated-nobody-3d-illustration/552664145" class="citation-link" target="_blank">https://stock.adobe.com/ca/images/white-t-shirt...</a></td>
+    </tr>
+
+    <tr>
+      <td>Software Tools</td>
+      <td>I used Google Docs to track my research links, store and write my discussion posts. I used Google Sheets to track all my citations which are now listed here on this page. I used VSCodium for coding all the webpages.</td>
+      <td>Google Docs, Google Sheets & VSCodium. <a href="https://docs.google.com/" class="citation-link" target="_blank">https://docs.google.com/</a></td> 
+    </tr>
+    
+    <tr>
+      <td>CSS Property: Pretty</td>
+      <td>Just a random text wrapping CSS property I found which I thought was interesting and funny. 'text-wrap:pretty' actually prevents some elements of bad typography, like orphans at the bottom of bodies of text, instead of having to manually add line breaks like I usually would.</td>
+      <td>WebKit. “Better typography with text-wrap: pretty.” Accessed Feb 2026. <a href="https://webkit.org/blog/16547/better-typography-with-text-wrap-pretty/" class="citation-link" target="_blank">https://webkit.org/blog/16547/better-typography-with-text-wrap-pretty/</a></td>
+    </tr>
+
+    <tr>
+      <td>Total Possible Patterns</td>
+      <td>While easily calculatable, I found this reddit thread early on, one of the comments mentions how many possible variations an 8x8 grid contains, I actually originally thought it would be 64^2 since there's 64 cells that can be black or white, but it turned out to be the opposite 2^64.</td>
+      <td>Reddit. “All Possibilities of 3×3 Bits Assembled.” r/dataisbeautiful. Accessed Jan 2026. <a href="https://www.reddit.com/r/dataisbeautiful/comments/jddkgd/" class="citation-link" target="_blank">https://www.reddit.com/r/dataisbeautiful/comments/jddkgd/</a></td>
+    </tr>
+  </table>
+
+
+  <table class="code-table">
+    <colgroup>
+      <col style="width: 25%;">
+      <col style="width: 45%;"> <col style="width: 30%;"> 
+    </colgroup>
+    <tr>
+      <td class="title-cell" colspan="3">Code Citations</td> <!--This is the start of specifically the code citations-->
+    </tr>
+    
+    <tr>
+      <td>document.addEventListener</td>
+      <td>This is a function in the Javascript that waits for certain 'events' to happen, a key place where it's used on the site is waiting for the 'start' button on the title screen to be clicked and that 'event' makes the patterns start generating.</td>
+      <td>W3Schools. “JavaScript HTML DOM EventListener.” Accessed Feb 2026. <a href="https://www.w3schools.com/jsref/met_document_addeventlistener.asp" class="citation-link" target="_blank">https://www.w3schools.com/jsref/met_document_addeventlistener.asp</a></td>
+    </tr>
+    
+    <tr>
+      <td>document.getElementById</td>
+      <td>Sort of similar to how divs work in HTML, assigning an ID to one certain element in Javascript helps control it specifically. (I also learned this in a Computer Science course I'm taking this semester).</td>
+      <td>W3Schools. “HTML DOM Document getElementById().” Accessed Feb 2026. <a href="https://www.w3schools.com/jsref/met_document_getelementbyid.asp" class="citation-link" target="_blank">https://www.w3schools.com/jsref/met_document_getelementbyid.asp</a></td>
+    </tr>
+
+    <tr>
+      <td>document.querySelectorAll</td>
+      <td>Unlike getElementById above which only grabs one element, An example of where I used this on the site was selecting all the size selection buttons on the Shop page to change their code together.</td>
+      <td>Mozilla Developer Network. “Document.querySelectorAll().” Accessed Feb 2026. <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelectorAll" class="citation-link" target="_blank">https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelectorAll</a></td>
+    </tr>
+    
+    <tr>
+      <td>const variableName</td>
+      <td>Some variables on the site change, like the grid patterns and counter, but having a 'const' variable means having it never change and stay constant, some elements like that are like the container around the grid, or the speed slider.</td>
+      <td>Mozilla Developer Network. “const.” Accessed Feb 2026. <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const" class="citation-link" target="_blank">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const</a></td>
+    </tr>
+
+    <tr>
+      <td>let variableName</td>
+      <td>This is pretty much the opposite of const, 'let' variables would be ones that change a lot and are repeatedly updated in the code, like the counter under the ordered grid continously updating it's number.</td>
+      <td>Mozilla Developer Network. “let.” Accessed Feb 2026. <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let" class="citation-link" target="_blank">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let</a></td>
+    </tr>
+
+    <tr>
+      <td>BigInt(0)</td>
+      <td>Numbers larger than 2^53 need this function to run, even more necessary for my grid to get up to 18 quintillion. (I also found out about this from another student's citation Prof Craig linked to the discussion post)</td>
+      <td>W3Schools. “JavaScript BigInt.” Accessed Jan 2026. <a href="https://www.w3schools.com/js/js_bigint.asp" class="citation-link" target="_blank">https://www.w3schools.com/js/js_bigint.asp</a></td>
+    </tr>
+    
+    <tr>
+      <td>for (let i = 0; i < 64;<br> i++)</td>
+      <td>You'd notice that there's not much HTML code for the actual grid on the home page code, this loop automates that process, creating those grid cells within the browser memory as they come.</td>
+      <td>Mozilla Developer Network. “for statement.” Accessed Jan 2026. <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for" class="citation-link" target="_blank">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for</a></td>
+    </tr>
+
+    <tr>
+      <td>arr.forEach</td>
+      <td>So in my understanding an array is more like a list of elements, like the grid cells made using the loop above, and then functions applied to an array effect all the elements within it together.</td>
+      <td>W3Schools. “JavaScript Array forEach().” Accessed Feb 2026. <a href="https://www.w3schools.com/JSREF/jsref_foreach.asp" class="citation-link" target="_blank">https://www.w3schools.com/JSREF/jsref_foreach.asp</a></td>
+    </tr>
+    
+    <tr>
+      <td>document.createElement</td>
+      <td>This automatically creates an element in the HTML through Javascript, in my site it creates the entire grid on the home screen, instead of having the code permanently in that HTML, and this function can also create other elements like images or buttons based on other customizations.</td>
+      <td>W3Schools. “HTML DOM Document createElement().” Accessed Jan 2026. <a href="https://www.w3schools.com/jsref/met_document_createelement.asp" class="citation-link" target="_blank">https://www.w3schools.com/jsref/met_document_createelement.asp</a></td>
+    </tr>
+    
+    <tr>
+      <td>parent.appendChild</td>
+      <td>This is basically a second-part to the element created above, this takes that div created from the memory, and actually pastes it into the HTML of the page, essentially the transporter of the grid code from the Javascript to the HTML.</td>
+      <td>W3Schools. “HTML DOM Node appendChild().” Accessed Feb 2026. <a href="https://www.w3schools.com/jsref/met_node_appendchild.asp" class="citation-link" target="_blank">https://www.w3schools.com/jsref/met_node_appendchild.asp</a></td>
+    </tr>
+    
+    <tr>
+      <td>element.classList.toggle</td>
+      <td>This adds or removes the CSS classes on the grid cells to make them either white or black, ironic that I referred this code from the tutorial on how to make a 'dark mode' site, but it works.</td>
+      <td>W3Schools. “How TO - Toggle Dark Mode.” Accessed Feb 2026. <a href="https://www.w3schools.com/howto/howto_js_toggle_dark_mode.asp" class="citation-link" target="_blank">https://www.w3schools.com/howto/howto_js_toggle_dark_mode.asp</a></td>
+    </tr>
+
+    <tr>
+      <td>element.classList.add</td>
+      <td>Quite similar to the toggling function above, but this only does one action, like adding a CSS class and that's it, this same function wouldn't remove or change that one as well.</td>
+      <td>W3Schools. “How TO - Active Element.” Accessed Feb 2026. <a href="https://www.w3schools.com/howto/howto_js_active_element.asp" class="citation-link" target="_blank">https://www.w3schools.com/howto/howto_js_active_element.asp</a></td>
+    </tr>
+    
+    <tr>
+      <td>const arr = []</td>
+      <td>So this is basically like an empty array placed in the Javascript before the 64 grid cells are generated so that when they are, they can be grouped together into this array to be customizable later.</td>
+      <td>W3Schools. “JavaScript Array Const.” Accessed Jan 2026. <a href="https://www.w3schools.com/js/js_array_const.asp" class="citation-link" target="_blank">https://www.w3schools.com/js/js_array_const.asp</a></td>
+    </tr>
+    
+    <tr>
+      <td>arr.push</td>
+      <td>This is similaer to the classList adding, while the 64 cells are being generated and then are associated with that array, this function actually 'pushes' the squares into that said array completing that action.</td>
+      <td>Mozilla Developer Network. “Array.prototype.push().” Accessed Feb 2026. <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push" class="citation-link" target="_blank">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push</a></td>
+    </tr>
+    
+    <tr>
+      <td>Math.random()</td>
+      <td>So this is pretty interesting and relates to the random grid, it's essentially like a coin toss, generating a random 1 or 0 to decide wheter a cell in the random grid should be black or white. This basically tosses 64 coins at once every single to decide if the cells on the grid should be black or white.</td>
+      <td>W3Schools. “JavaScript Math.random().” Accessed Jan 2026. <a href="https://www.w3schools.com/jsref/jsref_random.asp" class="citation-link" target="_blank">https://www.w3schools.com/jsref/jsref_random.asp</a></td>
+    </tr>
+    
+    <tr>
+      <td>Math.floor()</td>
+      <td>This one is pretty straightforward, randomly generating within a range can give decimal digits, and this basically rounds those off, so the 1s and 0s would be definitely 1 or 0 and nothing decimal in between.</td>
+      <td>W3Schools. “JavaScript Math.floor().” Accessed Feb 2026. <a href="https://www.w3schools.com/jsreF/jsref_floor.asp" class="citation-link" target="_blank">https://www.w3schools.com/jsreF/jsref_floor.asp</a></td>
+    </tr>
+    
+    <tr>
+      <td>setInterval</td>
+      <td>This creates a set interval at where a function would run in the code, in our case having a particular version of the grid pattern generate in a second, or 300 of them in a second, this decides the interval at which the function is repeated.</td>
+      <td>W3Schools. “Window setInterval().” Accessed Jan 2026. <a href="https://www.w3schools.com/jsref/met_win_setinterval.asp" class="citation-link" target="_blank">https://www.w3schools.com/jsref/met_win_setinterval.asp</a></td>
+    </tr>
+    
+    <tr>
+      <td>clearInterval</td>
+      <td>This function would not be necessary on my site since the patterns never stop generating, that's the idea, generating for billions of years, but when it comes to changing the speed of the ordered grid, one interval has to be cleared before a different speed interval is added to change the speed of pattern generation.</td>
+      <td>W3Schools. “Window clearInterval().” Accessed Feb 2026. <a href="https://www.w3schools.com/jsref/met_win_clearinterval.asp" class="citation-link" target="_blank">https://www.w3schools.com/jsref/met_win_clearinterval.asp</a></td>
+    </tr>
+    
+    <tr>
+      <td>setTimeout</td>
+      <td>This is used more for the glitchy title screen, it acts a a countdown to a function within a set interval, in my case waiting a couple of seconds, I believe 3 in this case, and then glitching some of the letters to alternate ones, then it resets and starts over.</td>
+      <td>W3Schools. “Window setTimeout().” Accessed Feb 2026. <a href="https://www.w3schools.com/jsref/met_win_settimeout.asp" class="citation-link" target="_blank">https://www.w3schools.com/jsref/met_win_settimeout.asp</a></td>
+    </tr>
+    
+    <tr>
+      <td>index >> BigInt(63-i)</td>
+      <td>This took me a while to understand but I think the way I understand it is that there's a single large number holding the binary of the entire grid at once, and this basically cut down and specifies which part of that full binary number is for which specific cell.</td>
+      <td>GeeksforGeeks. “JavaScript Program to Generate All Binary Strings.” Accessed Jan 2026. <a href="https://www.geeksforgeeks.org/javascript/javascript-program-to-generate-all-binary-strings-from-given-pattern/" class="citation-link" target="_blank">https://www.geeksforgeeks.org/...</a></td>
+    </tr>
+
+    <tr>
+      <td>Bitwise & 1n</td>
+      <td>This basically works alongside the function above, simplifying that piece of binary to just a 1 or 0 to decide if the cell is supposed to be black or white.</td>
+      <td>Mozilla Developer Network. “Bitwise AND (&).” Accessed Jan 2026. <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_AND" class="citation-link" target="_blank">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_AND</a></td>
+    </tr>
+    
+    <tr>
+      <td>parseInt</td>
+      <td>For some reason the HTML input of sliders comes out as a 'word label' instead of an actual number, so if the slider is moved to 50 patterns per second, it doesn't read as the number 50, but this function converts it to a number.</td>
+      <td>W3Schools. “JavaScript parseInt().” Accessed Feb 2026. <a href="https://www.w3schools.com/jsref/jsref_parseint.asp" class="citation-link" target="_blank">https://www.w3schools.com/jsref/jsref_parseint.asp</a></td>
+    </tr>
+
+    <tr>
+      <td>&lt;input type="range"&gt;</td>
+      <td>This is the slider itself, considred a 'range' input in the HTML, in which I then added a minimum and maximum range.</td>
+      <td>W3Schools. "HTML Input Types." Accessed Jan 2026. <a href="https://www.w3schools.com/tags/att_input_type_range.asp" class="citation-link" target="_blank">https://www.w3schools.com/tags/att_input_type_range.asp</a></td>
+    </tr>
+    
+    <tr>
+      <td>num.toLocaleString</td>
+      <td>This automatically formatted large numbers to use commas after every 3 digits, it's used many times throughout the site, clumping all the digits together makes it harder to understand how large the number is I feel.</td>
+      <td>W3Schools. “JavaScript Number toLocaleString().” Accessed Feb 2026. <a href="https://www.w3schools.com/jsref/jsref_tolocalestring_number.asp" class="citation-link" target="_blank">https://www.w3schools.com/jsref/jsref_tolocalestring_number.asp</a></td>
+    </tr>
+    
+    <tr>
+      <td>str.split</td>
+      <td>This basically takes words apart and 'splits' them, in my site's case, on the title screen the main heading FINITE GRIDS is split into individual letters to be customized individually to glitch to certain characters.</td>
+      <td>Stack Overflow. "Randomly change text characters in JS." Accessed Feb 2026. <a href="https://stackoverflow.com/questions/78282373" class="citation-link" target="_blank">https://stackoverflow.com/questions/78282373</a></td>a></td>
+    </tr>
+
+    <tr>
+      <td>arr.map</td>
+      <td>This works along the split function above this, going through and picking which characters are to be specifically changes, in my case I customized certain ones to do certain things, like S to glitch to $ because they look similar.</td>
+      <td>Stack Overflow. "Randomly change text characters in JS." Accessed Feb 2026. <a href="https://stackoverflow.com/questions/78282373" class="citation-link" target="_blank">https://stackoverflow.com/questions/78282373</a></td>
+    </tr>
+    
+    <tr>
+      <td>arr.join</td>
+      <td>This takes that split title and putsit back together to display on the title screen, so the last two functions and this one work together for one small task.</td>
+      <td>Stack Overflow. "Randomly change text characters in JS." Accessed Feb 2026. <a href="https://stackoverflow.com/questions/78282373" class="citation-link" target="_blank">https://stackoverflow.com/questions/78282373</a></td>
+    </tr>
+    
+    <tr>
+      <td>str.replace</td>
+      <td>I used this for a very specific reason, I wanted to dim the color of the commas used throughout all numbers on the site because while they were useful they were also distracting, so this automatically selects them and applied a CSS class to them to be dimmer.</td>
+      <td>W3Schools. “JavaScript String replace().” Accessed Feb 2026. <a href="https://www.w3schools.com/jsref/jsref_replace.asp" class="citation-link" target="_blank">https://www.w3schools.com/jsref/jsref_replace.asp</a></td>
+    </tr>
+
+    <tr>
+      <td>element.innerHTML</td>
+      <td>This specifies that when code like the one above are adding text as an element, it doesn't go through as just plain text but actual HTML specifically.</td>
+      <td>W3Schools. “HTML DOM Element innerHTML.” Accessed Feb 2026. <a href="https://www.w3schools.com/jsref/prop_html_innerhtml.asp" class="citation-link" target="_blank">https://www.w3schools.com/jsref/prop_html_innerhtml.asp</a></td>
+    </tr>
+
+    <tr>
+      <td>element.style.display</td>
+      <td>After the title screen is transitioned-out, it's still technically there, so to avoid any overlapping clicking or errors this completely removes the title screen entirely.</td>
+      <td>Mozilla Developer Network. “HTMLElement.style.” Accessed Feb 2026. <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/style" class="citation-link" target="_blank">https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/style</a></td>
+    </tr>
+
+    <tr>
+      <td>onclick="function()"</td>
+      <td>This makes sure that the function starting the grid pattern generation starts only AFTER the start button is clicked, so that if someone took their time entering the site, the patterns haven't generated well past the first one.</td>
+      <td>W3Schools. “HTML DOM Event onclick.” Accessed Feb 2026. <a href="https://www.w3schools.com/jsref/event_onclick.asp" class="citation-link" target="_blank">https://www.w3schools.com/jsref/event_onclick.asp</a></td>
+    </tr>
+    
+    <tr>
+      <td>clip-path: inset</td>
+      <td>I found a site that has a library of available CSS transitions to use, and found a simple one most closely matching the style of my site, the one I chose being a square-closing type transition.</td>
+      <td>Argyle, Adam. "Transition.style." CSS Transitions. Accessed Feb 2026. <a href="https://www.transition.style/" class="citation-link" target="_blank">https://www.transition.style/</a></td>
+    </tr>
+
+  </table>
+
+</div>
+<div class="footer">
+  © 2026 by Ayaan Ahmed Studios
+</div>
+
+<div class="nav-container">
+  <a href="index.html" class="nav-link">HOME</a>
+  <a href="shop.html" class="nav-link">SHOP</a>
+</div>
+
+</body>
+</html>
